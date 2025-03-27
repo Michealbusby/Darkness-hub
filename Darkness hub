@@ -1,0 +1,198 @@
+-- Darkness Hub UI
+local DarknessHub = Instance.new("ScreenGui")
+local MainFrame = Instance.new("Frame")
+local Sidebar = Instance.new("Frame")
+local Title = Instance.new("TextLabel")
+local CloseButton = Instance.new("TextButton")
+local ExpandButton = Instance.new("TextButton")
+
+-- Sidebar Buttons
+local HomeButton = Instance.new("TextButton")
+local SpeedButton = Instance.new("TextButton")
+local FlyButton = Instance.new("TextButton")
+local NoclipButton = Instance.new("TextButton")
+
+-- Home Message UI
+local HomeFrame = Instance.new("Frame")
+local HomeText = Instance.new("TextLabel")
+
+-- Speed GUI
+local SpeedFrame = Instance.new("Frame")
+local SpeedLabel = Instance.new("TextLabel")
+local SpeedInput = Instance.new("TextBox")
+local ChangeSpeedButton = Instance.new("TextButton")
+
+-- Fly GUI (as a toggle via sidebar)
+local flyEnabled = false
+
+-- Noclip Functionality
+local noclipEnabled = false
+
+-- Properties
+DarknessHub.Name = "DarknessHub"
+DarknessHub.Parent = game.CoreGui
+
+MainFrame.Name = "MainFrame"
+MainFrame.Parent = DarknessHub
+MainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+MainFrame.Size = UDim2.new(0, 400, 0, 300)
+MainFrame.Position = UDim2.new(0.5, -200, 0.5, -150)
+
+Sidebar.Name = "Sidebar"
+Sidebar.Parent = MainFrame
+Sidebar.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+Sidebar.Size = UDim2.new(0, 100, 1, 0)
+
+Title.Name = "Title"
+Title.Parent = MainFrame
+Title.Text = "Darkness Hub"
+Title.Size = UDim2.new(1, 0, 0.15, 0)
+Title.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+Title.Font = Enum.Font.SourceSansBold
+Title.TextScaled = true
+
+CloseButton.Name = "CloseButton"
+CloseButton.Parent = MainFrame
+CloseButton.Text = "X"
+CloseButton.Size = UDim2.new(0.1, 0, 0.15, 0)
+CloseButton.Position = UDim2.new(0.9, 0, 0)
+CloseButton.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
+CloseButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+
+ExpandButton.Name = "ExpandButton"
+ExpandButton.Parent = DarknessHub
+ExpandButton.Text = "+"
+ExpandButton.Size = UDim2.new(0, 50, 0, 50)
+ExpandButton.Position = UDim2.new(0.02, 0, 0.02, 0)
+ExpandButton.BackgroundColor3 = Color3.fromRGB(50, 200, 50)
+ExpandButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+ExpandButton.Visible = false
+
+-- Create Sidebar Buttons Function
+local function createSidebarButton(name, text, position)
+    local button = Instance.new("TextButton")
+    button.Name = name
+    button.Parent = Sidebar
+    button.Text = text
+    button.Size = UDim2.new(1, 0, 0.15, 0)
+    button.Position = UDim2.new(0, 0, position, 0)
+    button.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+    button.TextColor3 = Color3.fromRGB(255, 255, 255)
+    return button
+end
+
+HomeButton = createSidebarButton("HomeButton", "Home", 0.2)
+SpeedButton = createSidebarButton("SpeedButton", "Speed", 0.4)
+FlyButton = createSidebarButton("FlyButton", "Fly", 0.6)
+NoclipButton = createSidebarButton("NoclipButton", "Noclip", 0.8)
+
+-- Home Message UI Setup (Updated for proper text fitting)
+HomeFrame.Name = "HomeFrame"
+HomeFrame.Parent = MainFrame
+HomeFrame.Size = UDim2.new(0.65, 0, 0.35, 0)  -- slightly smaller than before
+HomeFrame.Position = UDim2.new(0.32, 0, 0.45, 0) -- centered in the remaining space
+HomeFrame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+HomeFrame.ClipsDescendants = true  -- ensures text doesn't overflow
+HomeFrame.Visible = true
+
+HomeText.Name = "HomeText"
+HomeText.Parent = HomeFrame
+HomeText.Text = "Hello, welcome to Darkness Hub!\nCreated by _purple_vortex_.\nJoin our Discord: https://discord.gg/9vVWTY3mHt"
+HomeText.Size = UDim2.new(1, -10, 1, -10) -- leave a small margin
+HomeText.Position = UDim2.new(0, 5, 0, 5)
+HomeText.TextColor3 = Color3.fromRGB(255, 255, 255)
+HomeText.TextScaled = true
+HomeText.TextWrapped = true
+HomeText.BackgroundTransparency = 1
+
+-- Speed GUI Setup
+SpeedFrame.Parent = DarknessHub
+SpeedFrame.Size = UDim2.new(0, 200, 0, 100)
+SpeedFrame.Position = UDim2.new(0.5, -100, 0.5, -50)
+SpeedFrame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+SpeedFrame.Visible = false
+
+SpeedLabel.Parent = SpeedFrame
+SpeedLabel.Text = "Set Speed"
+SpeedLabel.Size = UDim2.new(1, 0, 0.3, 0)
+SpeedLabel.BackgroundTransparency = 1
+SpeedLabel.TextColor3 = Color3.fromRGB(255,255,255)
+
+SpeedInput.Parent = SpeedFrame
+SpeedInput.PlaceholderText = "Enter Speed"
+SpeedInput.Size = UDim2.new(1, 0, 0.3, 0)
+SpeedInput.Position = UDim2.new(0, 0, 0.3, 0)
+SpeedInput.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+SpeedInput.TextColor3 = Color3.fromRGB(255, 255, 255)
+
+ChangeSpeedButton.Parent = SpeedFrame
+ChangeSpeedButton.Text = "Change"
+ChangeSpeedButton.Size = UDim2.new(1, 0, 0.3, 0)
+ChangeSpeedButton.Position = UDim2.new(0, 0, 0.6, 0)
+ChangeSpeedButton.BackgroundColor3 = Color3.fromRGB(50, 150, 50)
+ChangeSpeedButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+
+ChangeSpeedButton.MouseButton1Click:Connect(function()
+    local speed = tonumber(SpeedInput.Text)
+    if speed then
+        game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = speed
+    end
+end)
+
+-- Fly Functionality (Toggle On/Off)
+FlyButton.MouseButton1Click:Connect(function()
+    local player = game.Players.LocalPlayer
+    local character = player.Character or player.CharacterAdded:Wait()
+    local hrp = character:FindFirstChild("HumanoidRootPart")
+    if not hrp then return end
+
+    flyEnabled = not flyEnabled
+    if flyEnabled then
+        local bodyVelocity = Instance.new("BodyVelocity")
+        bodyVelocity.Name = "FlyVelocity"
+        bodyVelocity.Velocity = Vector3.new(0, 50, 0)
+        bodyVelocity.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
+        bodyVelocity.Parent = hrp
+        character:SetAttribute("Flying", true)
+    else
+        if hrp:FindFirstChild("FlyVelocity") then
+            hrp.FlyVelocity:Destroy()
+        end
+        character:SetAttribute("Flying", false)
+    end
+end)
+
+-- Noclip Functionality
+NoclipButton.MouseButton1Click:Connect(function()
+    noclipEnabled = not noclipEnabled
+    local character = game.Players.LocalPlayer.Character
+    if not character then return end
+    for _, part in pairs(character:GetChildren()) do
+        if part:IsA("BasePart") then
+            part.CanCollide = not noclipEnabled
+        end
+    end
+end)
+
+-- Sidebar Functions
+SpeedButton.MouseButton1Click:Connect(function() 
+    SpeedFrame.Visible = not SpeedFrame.Visible 
+    HomeFrame.Visible = false
+end)
+
+HomeButton.MouseButton1Click:Connect(function()
+    HomeFrame.Visible = true
+    SpeedFrame.Visible = false
+end)
+
+-- Close and Expand Functionality
+CloseButton.MouseButton1Click:Connect(function() 
+    MainFrame.Visible = false 
+    ExpandButton.Visible = true 
+end)
+
+ExpandButton.MouseButton1Click:Connect(function() 
+    MainFrame.Visible = true 
+    ExpandButton.Visible = false 
+end)
