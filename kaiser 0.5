@@ -1,0 +1,158 @@
+-- Kaiser Custom Moveset for Blue Lock Rivals (Optimized UI)
+-- Delta Executor (iOS Compatible)
+
+local player = game.Players.LocalPlayer
+local char = player.Character or player.CharacterAdded:Wait()
+local hum = char:FindFirstChildOfClass("Humanoid")
+local uis = game:GetService("UserInputService")
+local lighting = game:GetService("Lighting")
+
+-- Update the Style GUI
+pcall(function()
+    local styleGui = player.PlayerGui:FindFirstChild("StyleGUI")
+    if styleGui then
+        local nameLabel = styleGui:FindFirstChild("StyleName")
+        local bioLabel = styleGui:FindFirstChild("StyleBio")
+        if nameLabel then nameLabel.Text = "MICHAEL KAISER" end
+        if bioLabel then bioLabel.Text = "The Great Universal Kaiser [Made by _purple_vortex_]" end
+    end
+end)
+
+-- Create UI for moveset buttons
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "KaiserMoveset"
+screenGui.Parent = game.CoreGui
+
+-- Helper function to create a button with proper scaling
+local function createButton(key, abilityName, xPosition, callback)
+    local btn = Instance.new("TextButton", screenGui)
+    btn.Size = UDim2.new(0, 65, 0, 40) -- Smaller rectangular button
+    btn.Position = UDim2.new(0, xPosition, 1, -50) -- Bottom of screen
+    btn.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+    btn.BorderSizePixel = 2
+    btn.BorderColor3 = Color3.fromRGB(255, 215, 0) -- Gold outline
+    btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    btn.Font = Enum.Font.GothamBold
+    btn.TextSize = 8 -- Adjusted for fitting text
+    btn.TextWrapped = true -- Ensures text wraps if needed
+    btn.Text = key .. "\n" .. abilityName
+    btn.MouseButton1Click:Connect(callback)
+    return btn
+end
+
+----------------------------------
+-- Ability Function Definitions --
+----------------------------------
+
+local function EchoStride()
+    print("Echo Stride activated")
+    local originalSpeed = hum.WalkSpeed
+    hum.WalkSpeed = originalSpeed + 10
+    wait(3)
+    hum.WalkSpeed = originalSpeed
+end
+
+local function KaiserImpact()
+    print("Kaiser Impact activated")
+    local ball = workspace:FindFirstChild("SoccerBall")
+    if ball and ball:IsA("BasePart") then
+        ball.Velocity = char.Head.CFrame.LookVector * 200
+    end
+end
+
+local function WarpStep()
+    print("Warp Step activated")
+    if char.PrimaryPart then
+        char:SetPrimaryPartCFrame(char.PrimaryPart.CFrame * CFrame.new(10, 0, 0))
+    end
+end
+
+local function Magnus()
+    print("Magnus activated")
+    local originalSpeed = hum.WalkSpeed
+    hum.WalkSpeed = originalSpeed + 15
+    wait(2)
+    hum.WalkSpeed = originalSpeed
+end
+
+local function KaiserPass()
+    print("Kaiser Pass activated")
+    if game.ReplicatedStorage:FindFirstChild("RemoteEvent") then
+        game.ReplicatedStorage.RemoteEvent:FireServer("KaiserPass")
+    end
+end
+
+local function Metavision()
+    print("Metavision activated")
+    
+    local blur = Instance.new("BlurEffect")
+    blur.Size = 10
+    blur.Parent = lighting
+    
+    local originalSpeed = hum.WalkSpeed
+    hum.WalkSpeed = originalSpeed * 1.5
+
+    for _, otherPlayer in pairs(game.Players:GetPlayers()) do
+        if otherPlayer ~= player then
+            local otherChar = otherPlayer.Character
+            if otherChar then
+                local styleValue = otherChar:FindFirstChild("Style")
+                if styleValue and styleValue:IsA("StringValue") then
+                    print(otherPlayer.Name .. " has the style: " .. styleValue.Value)
+                else
+                    print(otherPlayer.Name .. " has an unknown style")
+                end
+            end
+        end
+    end
+
+    wait(5)
+    blur:Destroy()
+    hum.WalkSpeed = originalSpeed
+end
+
+local function ZombieDribble()
+    print("Zombie Dribble activated")
+    if game.ReplicatedStorage:FindFirstChild("RemoteEvent") then
+        game.ReplicatedStorage.RemoteEvent:FireServer("ZombieDribble")
+    end
+end
+
+local function ZombieDash()
+    print("Zombie Dash activated")
+    if char.PrimaryPart then
+        char:SetPrimaryPartCFrame(char.PrimaryPart.CFrame * CFrame.new(20, 0, 0))
+    end
+end
+
+local function GoldenDefense()
+    print("Golden Defense activated")
+    local originalSpeed = hum.WalkSpeed
+    hum.WalkSpeed = 8
+    wait(5)
+    hum.WalkSpeed = originalSpeed
+end
+
+local function EatMyDustShitHeads()
+    print("Eat My Dust Shit Heads activated")
+    hum.WalkSpeed = 16
+end
+
+----------------------------------
+-- Create UI Buttons (Bottom Row)
+----------------------------------
+local startX = 30
+local spacing = 80
+
+createButton("Z", "Echo", startX + (0 * spacing), EchoStride)
+createButton("H", "Impact", startX + (1 * spacing), KaiserImpact)
+createButton("T", "Warp", startX + (2 * spacing), WarpStep)
+createButton("Y", "Magnus", startX + (3 * spacing), Magnus)
+createButton("N", "Pass", startX + (4 * spacing), KaiserPass)
+createButton("M", "Metavision", startX + (5 * spacing), Metavision)
+createButton("C", "Zombie Drib", startX + (6 * spacing), ZombieDribble)
+createButton("V", "Zombie Dash", startX + (7 * spacing), ZombieDash)
+createButton("B", "Defense", startX + (8 * spacing), GoldenDefense)
+createButton("P", "Eat My Dust", startX + (9 * spacing), EatMyDustShitHeads)
+
+print("Kaiser Custom Moveset Loaded Successfully")
