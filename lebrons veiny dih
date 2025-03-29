@@ -1,0 +1,46 @@
+-- LocalScript
+
+local player = game.Players.LocalPlayer
+local playerGui = player:WaitForChild("PlayerGui")
+
+-- Create a ScreenGui
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "SpeedBoostGui"
+screenGui.Parent = playerGui
+
+-- Create the square button (100x100) at the bottom-left side of the screen
+local button = Instance.new("TextButton")
+button.Name = "SpeedBoostButton"
+button.Size = UDim2.new(0, 100, 0, 100)
+button.Position = UDim2.new(0, 10, 1, -110) -- near bottom-left
+button.Text = "lebrons veiny dih power"
+button.TextScaled = true                   -- Auto-scale text to fit the button
+button.BackgroundColor3 = Color3.new(0.2, 0.5, 0.8) -- Optional styling
+button.Parent = screenGui
+
+-- Speed boost settings
+local speedBoostMultiplier = 2
+local boostDuration = 15
+local isEffectActive = false
+
+local function onButtonClicked()
+    if isEffectActive then
+        return
+    end
+    isEffectActive = true
+
+    local character = player.Character or player.CharacterAdded:Wait()
+    local humanoid = character:FindFirstChildOfClass("Humanoid")
+    if humanoid then
+        local originalWalkSpeed = humanoid.WalkSpeed
+        humanoid.WalkSpeed = originalWalkSpeed * speedBoostMultiplier
+        task.wait(boostDuration)
+        humanoid.WalkSpeed = originalWalkSpeed
+    end
+
+    isEffectActive = false
+end
+
+button.MouseButton1Click:Connect(onButtonClicked)
+
+print("Speed boost button loaded successfully!")
