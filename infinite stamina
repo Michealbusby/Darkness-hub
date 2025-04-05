@@ -1,0 +1,35 @@
+-- Infinite Stamina Script (LocalScript)
+
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+
+local player = Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+
+-- Wait for character to load completely
+character:WaitForChild("Humanoid")
+
+-- Notification (optional)
+local function notify(text)
+    game.StarterGui:SetCore("SendNotification", {
+        Title = "Darkness Hub",
+        Text = text,
+        Duration = 3
+    })
+end
+
+notify("Infinite Stamina Activated")
+
+-- Main loop to override stamina
+RunService.RenderStepped:Connect(function()
+    local humanoid = character:FindFirstChildOfClass("Humanoid")
+    
+    -- If stamina is part of a custom system
+    local staminaFolder = character:FindFirstChild("Stamina") or player:FindFirstChild("Stamina")
+
+    if staminaFolder and staminaFolder:IsA("NumberValue") then
+        staminaFolder.Value = 100 -- or any high number you prefer
+    elseif humanoid and humanoid:FindFirstChild("Stamina") then
+        humanoid.Stamina.Value = 100
+    end
+end)
