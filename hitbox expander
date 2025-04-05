@@ -1,0 +1,96 @@
+-- LocalScript inside StarterPlayerScripts
+
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+
+-- Splash Screen
+local splashGui = Instance.new("ScreenGui", player:WaitForChild("PlayerGui"))
+splashGui.IgnoreGuiInset = true
+splashGui.ResetOnSpawn = false
+
+local splashFrame = Instance.new("Frame", splashGui)
+splashFrame.BackgroundColor3 = Color3.new(0, 0, 0)
+splashFrame.Size = UDim2.new(1, 0, 1, 0)
+splashFrame.Position = UDim2.new(0, 0, 0, 0)
+
+local splashText = Instance.new("TextLabel", splashFrame)
+splashText.Text = "Created by Darkness Hub"
+splashText.TextColor3 = Color3.new(1, 1, 1)
+splashText.BackgroundTransparency = 1
+splashText.Size = UDim2.new(1, 0, 1, 0)
+splashText.Font = Enum.Font.GothamBlack
+splashText.TextScaled = true
+
+wait(5)
+splashGui:Destroy()
+
+-- Main GUI
+local gui = Instance.new("ScreenGui", player:WaitForChild("PlayerGui"))
+gui.Name = "DarknessHubGUI"
+
+local mainFrame = Instance.new("Frame", gui)
+mainFrame.Position = UDim2.new(0.1, 0, 0.3, 0)
+mainFrame.Size = UDim2.new(0, 250, 0, 90)
+mainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+
+local button = Instance.new("TextButton", mainFrame)
+button.Text = "Enable Hitbox"
+button.Size = UDim2.new(1, 0, 0.45, 0)
+button.Position = UDim2.new(0, 0, 0, 0)
+button.BackgroundColor3 = Color3.fromRGB(100, 0, 0)
+button.TextColor3 = Color3.new(1, 1, 1)
+button.Font = Enum.Font.Gotham
+button.TextScaled = true
+
+local slider = Instance.new("TextBox", mainFrame)
+slider.PlaceholderText = "Hitbox Size (1-20)"
+slider.Text = ""
+slider.Position = UDim2.new(0, 0, 0.55, 0)
+slider.Size = UDim2.new(1, 0, 0.4, 0)
+slider.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+slider.TextColor3 = Color3.new(1, 1, 1)
+slider.Font = Enum.Font.Gotham
+slider.TextScaled = true
+
+-- Hitbox toggle logic
+local redBox = nil
+local hitboxEnabled = false
+
+local function createHitbox(size)
+	if redBox then redBox:Destroy() end
+	local hrp = character:FindFirstChild("HumanoidRootPart")
+	if not hrp then return end
+
+	redBox = Instance.new("BoxHandleAdornment")
+	redBox.Name = "RedHitbox"
+	redBox.Adornee = hrp
+	redBox.AlwaysOnTop = true
+	redBox.ZIndex = 10
+	redBox.Size = Vector3.new(size, size, size)
+	redBox.Color3 = Color3.new(1, 0, 0)
+	redBox.Transparency = 0.5
+	redBox.Parent = hrp
+end
+
+local function toggleHitbox()
+	hitboxEnabled = not hitboxEnabled
+	local size = tonumber(slider.Text)
+
+	if hitboxEnabled then
+		if size and size >= 1 and size <= 20 then
+			createHitbox(size)
+			button.BackgroundColor3 = Color3.fromRGB(0, 150, 0)
+			button.Text = "Disable Hitbox"
+		else
+			warn("Invalid size entered! Must be between 1 and 20.")
+			hitboxEnabled = false
+		end
+	else
+		if redBox then redBox:Destroy() redBox = nil end
+		button.BackgroundColor3 = Color3.fromRGB(100, 0, 0)
+		button.Text = "Enable Hitbox"
+	end
+end
+
+button.MouseButton1Click:Connect(toggleHitbox)
