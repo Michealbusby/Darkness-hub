@@ -1,0 +1,123 @@
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
+
+local LocalPlayer = Players.LocalPlayer
+local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+local Humanoid = Character:WaitForChild("Humanoid")
+local HumanoidRootPart = Character:WaitForChild("HumanoidRootPart")
+local Camera = workspace.CurrentCamera
+
+local GUI = Instance.new("ScreenGui")
+GUI.Parent = LocalPlayer:WaitForChild("PlayerGui")
+
+local ControlButton = Instance.new("TextButton")
+ControlButton.Size = UDim2.new(0.15, 0, 0.08, 0)
+ControlButton.Position = UDim2.new(0.1, 0, 0.8, 0)
+ControlButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+ControlButton.Text = "CONTROL"
+ControlButton.Parent = GUI
+
+local ControlFrame = Instance.new("Frame")
+ControlFrame.Size = UDim2.new(0.3, 0, 0.1, 0)
+ControlFrame.Position = UDim2.new(0.35, 0, 0.6, 0)
+ControlFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+ControlFrame.Visible = false
+ControlFrame.Parent = GUI
+
+local SpeedLabel = Instance.new("TextLabel")
+SpeedLabel.Size = UDim2.new(1, 0, 0.3, 0)
+SpeedLabel.BackgroundTransparency = 1
+SpeedLabel.Text = "Speed: 70"
+SpeedLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+SpeedLabel.TextScaled = true
+SpeedLabel.Parent = ControlFrame
+
+local SpeedInput = Instance.new("TextBox")
+SpeedInput.Size = UDim2.new(0.8, 0, 0.4, 0)
+SpeedInput.Position = UDim2.new(0.1, 0, 0.5, 0)
+SpeedInput.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+SpeedInput.TextColor3 = Color3.fromRGB(255, 255, 255)
+SpeedInput.Text = "70"
+SpeedInput.Parent = ControlFrame
+
+local CreditsLabel = Instance.new("TextLabel")
+CreditsLabel.Size = UDim2.new(0.3, 0, 0.1, 0)
+CreditsLabel.Position = UDim2.new(0.35, 0, 0.9, 0)
+CreditsLabel.BackgroundTransparency = 1
+CreditsLabel.Text = "Made within Darkness Hub"
+CreditsLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+CreditsLabel.TextScaled = true
+CreditsLabel.Parent = GUI
+CreditsLabel.Visible = true
+
+-- Hide credits after 30 seconds
+task.delay(30, function()
+    CreditsLabel.Visible = false
+end)
+
+local IsControlling = false
+local Ball
+local VelocityBody
+local SpeedValue = 70
+
+local function FindFootball()
+    return workspace:FindFirstChild("Football")
+end
+
+local function StartControlling()
+    if not Ball then return end
+
+    if VelocityBody then
+        VelocityBody:Destroy()
+        VelocityBody = nil
+    end
+
+    Camera.CameraSubject = Ball
+    local ControlVelocity = Instance.new("BodyVelocity")
+    ControlVelocity.MaxForce = Vector3.new(999999, 999999, 999999)
+    ControlVelocity.Parent = Ball
+
+    local ControlConnection
+    ControlConnection = RunService.Heartbeat:Connect(function()
+        if not IsControlling or not Ball or not Ball.Parent then
+            ControlVelocity:Destroy()
+            Camera.CameraSubject = Character
+            if ControlConnection then
+                ControlConnection:Disconnect()
+            end
+            return
+        end
+        ControlVelocity.Velocity = Camera.CFrame.LookVector * SpeedValue
+    end)
+end
+
+ControlButton.MouseButton1Click:Connect(function()
+    if not Ball then
+        Ball = FindFootball()
+        if not Ball then
+            warn("No Ball Found!")
+            return
+        end
+    end
+
+    IsControlling = not IsControlling
+    ControlButton.BackgroundColor3 = IsControlling and Color3.fromRGB(0, 255, 0) or Color3.fromRGB(255, 0, 0)
+    ControlFrame.Visible = IsControlling
+
+    if IsControlling then
+        StartControlling()
+    end
+end)
+
+SpeedInput.FocusLost:Connect(function(enterPressed)
+    if enterPressed then
+        local newSpeed = tonumber(SpeedInput.Text)
+        if newSpeed and newSpeed > 0 then
+            SpeedValue = newSpeed
+            SpeedLabel.Text = "Speed: " .. SpeedValue
+        else
+            SpeedInput.Text = tostring(SpeedValue)
+        end
+    end
+end)
