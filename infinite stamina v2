@@ -1,0 +1,34 @@
+-- Darkness Hub - Infinite Stamina Script for Blue Lock Rivals (Dev/Test Use)
+
+-- Notification
+game.StarterGui:SetCore("SendNotification", {
+    Title = "Darkness Hub",
+    Text = "Made by Darkness Hub",
+    Duration = 5
+})
+
+local player = game.Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+
+-- Freeze Stamina
+task.spawn(function()
+    while true do
+        local stamina = character:FindFirstChild("Stamina") or character:WaitForChild("Stamina")
+        if stamina and stamina:IsA("NumberValue") then
+            stamina.Value = 100
+        end
+        task.wait(0.1)
+    end
+end)
+
+-- Remove Stamina Bar GUI
+task.delay(1, function()
+    local playerGui = player:WaitForChild("PlayerGui")
+    for _, gui in pairs(playerGui:GetDescendants()) do
+        if gui:IsA("Frame") or gui:IsA("ImageLabel") or gui:IsA("TextLabel") then
+            if string.lower(gui.Name):find("stamina") then
+                gui:Destroy()
+            end
+        end
+    end
+end)
