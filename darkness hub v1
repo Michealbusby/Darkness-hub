@@ -1,0 +1,213 @@
+-- Darkness Hub: Expanded UI with Speed Input
+
+-- Notification
+pcall(function()
+    game.StarterGui:SetCore("SendNotification", {
+        Title = "Darkness Hub",
+        Text = "Made by Darkness Hub",
+        Duration = 5
+    })
+end)
+
+local player = game.Players.LocalPlayer
+local UIS = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
+
+-- GUI Setup
+local screenGui = Instance.new("ScreenGui", player:WaitForChild("PlayerGui"))
+screenGui.Name = "DarknessHubUI"
+screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+screenGui.ResetOnSpawn = false
+
+-- Main Frame
+local mainFrame = Instance.new("Frame", screenGui)
+mainFrame.Size = UDim2.new(0, 240, 0, 400)
+mainFrame.Position = UDim2.new(0, 20, 0, 80)
+mainFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+mainFrame.BorderSizePixel = 0
+mainFrame.Active = true
+mainFrame.Draggable = true
+
+-- Title
+local title = Instance.new("TextLabel", mainFrame)
+title.Size = UDim2.new(1, 0, 0, 40)
+title.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+title.Text = "Darkness Hub"
+title.Font = Enum.Font.GothamBold
+title.TextColor3 = Color3.fromRGB(255, 255, 255)
+title.TextSize = 18
+title.BorderSizePixel = 0
+
+-- Button Template
+local buttonYOffset = 50
+local function createButton(name, callback)
+    local btn = Instance.new("TextButton", mainFrame)
+    btn.Size = UDim2.new(1, -20, 0, 35)
+    btn.Position = UDim2.new(0, 10, 0, buttonYOffset)
+    btn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+    btn.TextColor3 = Color3.new(1, 1, 1)
+    btn.Font = Enum.Font.Gotham
+    btn.TextSize = 14
+    btn.Text = name
+    btn.AutoButtonColor = true
+    btn.BorderSizePixel = 0
+    btn.MouseButton1Click:Connect(callback)
+
+    buttonYOffset = buttonYOffset + 40
+end
+
+-- ESP
+local function enableESP()
+    for _, p in pairs(game.Players:GetPlayers()) do
+        if p ~= player and p.Character and not p.Character:FindFirstChild("ESPTag") then
+            local head = p.Character:FindFirstChild("Head")
+            if head then
+                local esp = Instance.new("BillboardGui", head)
+                esp.Name = "ESPTag"
+                esp.Size = UDim2.new(0, 100, 0, 40)
+                esp.AlwaysOnTop = true
+                esp.StudsOffset = Vector3.new(0, 2, 0)
+
+                local label = Instance.new("TextLabel", esp)
+                label.Size = UDim2.new(1, 0, 1, 0)
+                label.BackgroundTransparency = 1
+                label.TextColor3 = Color3.fromRGB(255, 0, 0)
+                label.Text = p.Name
+                label.Font = Enum.Font.GothamBold
+                label.TextScaled = true
+            end
+        end
+    end
+end
+
+-- Infinite Jump
+local infiniteJump = false
+UIS.JumpRequest:Connect(function()
+    if infiniteJump and player.Character then
+        local humanoid = player.Character:FindFirstChildOfClass("Humanoid")
+        if humanoid then
+            humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+        end
+    end
+end)
+
+-- Noclip
+local noclip = false
+RunService.Stepped:Connect(function()
+    if noclip and player.Character then
+        for _, part in pairs(player.Character:GetDescendants()) do
+            if part:IsA("BasePart") then
+                part.CanCollide = false
+            end
+        end
+    end
+end)
+
+-- Fly
+local flying = false
+local flySpeed = 50
+local bodyGyro, bodyVel
+local function toggleFly()
+    flying = not flying
+    local char = player.Character
+    if not char then return end
+    local hrp = char:FindFirstChild("HumanoidRootPart")
+    if not hrp then return end
+
+    if flying then
+        bodyGyro = Instance.new("BodyGyro", hrp)
+        bodyGyro.P = 9e4
+        bodyGyro.MaxTorque = Vector3.new(9e9, 9e9, 9e9)
+        bodyGyro.CFrame = hrp.CFrame
+
+        bodyVel = Instance.new("BodyVelocity", hrp)
+        bodyVel.Velocity = Vector3.new(0, 0, 0)
+        bodyVel.MaxForce = Vector3.new(9e9, 9e9, 9e9)
+
+        RunService.Heartbeat:Connect(function()
+            if flying and player.Character then
+                bodyGyro.CFrame = workspace.CurrentCamera.CFrame
+                bodyVel.Velocity = workspace.CurrentCamera.CFrame.LookVector * flySpeed
+            end
+        end)
+    else
+        if bodyGyro then bodyGyro:Destroy() end
+        if bodyVel then bodyVel:Destroy() end
+    end
+end
+
+-- Teleport to random player
+local function teleportToRandom()
+    local others = {}
+    for _, p in pairs(game.Players:GetPlayers()) do
+        if p ~= player and p.Character and p.Character:FindFirstChild("HumanoidRootPart") then
+            table.insert(others, p)
+        end
+    end
+    if #others > 0 then
+        local target = others[math.random(1, #others)]
+        local root = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
+        if root and target.Character then
+            root.CFrame = target.Character:FindFirstChild("HumanoidRootPart").CFrame + Vector3.new(0, 5, 0)
+        end
+    end
+end
+
+-- Speed Input GUI
+local function openSpeedInput()
+    if screenGui:FindFirstChild("SpeedInputFrame") then return end
+
+    local frame = Instance.new("Frame", screenGui)
+    frame.Name = "SpeedInputFrame"
+    frame.Size = UDim2.new(0, 200, 0, 100)
+    frame.Position = UDim2.new(0.5, -100, 0.5, -50)
+    frame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+    frame.BorderSizePixel = 0
+    frame.ZIndex = 100
+    frame.Active = true
+    frame.Draggable = true
+
+    local box = Instance.new("TextBox", frame)
+    box.Size = UDim2.new(1, -20, 0, 35)
+    box.Position = UDim2.new(0, 10, 0, 10)
+    box.PlaceholderText = "Enter WalkSpeed (Max 250)"
+    box.Font = Enum.Font.Gotham
+    box.TextSize = 14
+    box.TextColor3 = Color3.new(1, 1, 1)
+    box.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+    box.BorderSizePixel = 0
+    box.Text = ""
+    box.ClearTextOnFocus = false
+
+    local confirm = Instance.new("TextButton", frame)
+    confirm.Size = UDim2.new(1, -20, 0, 30)
+    confirm.Position = UDim2.new(0, 10, 0, 55)
+    confirm.Text = "Confirm"
+    confirm.Font = Enum.Font.GothamBold
+    confirm.TextSize = 14
+    confirm.TextColor3 = Color3.new(1, 1, 1)
+    confirm.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+    confirm.BorderSizePixel = 0
+
+    confirm.MouseButton1Click:Connect(function()
+        local num = tonumber(box.Text)
+        if num and num > 0 and num <= 250 then
+            local hum = player.Character and player.Character:FindFirstChildOfClass("Humanoid")
+            if hum then
+                hum.WalkSpeed = num
+            end
+            frame:Destroy()
+        else
+            box.Text = "Invalid (Max 250)"
+        end
+    end)
+end
+
+-- Create Buttons
+createButton("Enable ESP", enableESP)
+createButton("Toggle Infinite Jump", function() infiniteJump = not infiniteJump end)
+createButton("Toggle Noclip", function() noclip = not noclip end)
+createButton("Toggle Fly", toggleFly)
+createButton("Speed Boost", openSpeedInput)
+createButton("Teleport to Player", teleportToRandom)
+createButton("Destroy GUI", function() screenGui:Destroy() end)
