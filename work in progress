@@ -1,182 +1,157 @@
--- Darkness Hub UI Script for Blue Lock Rivals
+-- LocalScript for "Blue Lock Rivals" GUI
+
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
 
 local player = Players.LocalPlayer
 local character = player.Character or player.CharacterAdded:Wait()
-local Camera = workspace.CurrentCamera
+local humanoid = character:WaitForChild("Humanoid")
+local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
+local camera = workspace.CurrentCamera
 
--- GUI Setup
-local gui = Instance.new("ScreenGui", player:WaitForChild("PlayerGui"))
-gui.Name = "DarknessHubUI"
-gui.ResetOnSpawn = false
+-- Create Main GUI
+local mainGui = Instance.new("ScreenGui")
+mainGui.Name = "DarknessHubGUI"
+mainGui.Parent = player:WaitForChild("PlayerGui")
 
-local frame = Instance.new("Frame", gui)
-frame.Size = UDim2.new(0, 300, 0, 200)
-frame.Position = UDim2.new(0.05, 0, 0.3, 0)
-frame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+-- Create Main Frame
+local mainFrame = Instance.new("Frame")
+mainFrame.Size = UDim2.new(0, 300, 0, 200)
+mainFrame.Position = UDim2.new(0.1, 0, 0.3, 0)
+mainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+mainFrame.Parent = mainGui
 
-local function makeButton(text, position)
-	local btn = Instance.new("TextButton")
-	btn.Size = UDim2.new(0.9, 0, 0.2, 0)
-	btn.Position = UDim2.new(0.05, 0, position, 0)
-	btn.Text = text
-	btn.Font = Enum.Font.GothamBold
-	btn.TextScaled = true
-	btn.TextColor3 = Color3.new(1, 1, 1)
-	btn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-	btn.Parent = frame
-	return btn
+-- Function to create buttons
+local function createButton(name, position, text)
+    local button = Instance.new("TextButton")
+    button.Name = name
+    button.Size = UDim2.new(0.8, 0, 0.2, 0)
+    button.Position = UDim2.new(0.1, 0, position, 0)
+    button.BackgroundColor3 = Color3.fromRGB(100, 0, 0)
+    button.TextColor3 = Color3.new(1, 1, 1)
+    button.Font = Enum.Font.Gotham
+    button.TextScaled = true
+    button.Text = text
+    button.Parent = mainFrame
+    return button
 end
 
-local function notify()
-	local notif = Instance.new("TextLabel")
-	notif.Size = UDim2.new(0.3, 0, 0.1, 0)
-	notif.Position = UDim2.new(0.35, 0, 0.05, 0)
-	notif.Text = "Made by Darkness Hub"
-	notif.TextColor3 = Color3.new(1, 1, 1)
-	notif.BackgroundColor3 = Color3.new(0, 0, 0)
-	notif.TextScaled = true
-	notif.Parent = gui
-	task.delay(3, function()
-		notif:Destroy()
-	end)
+-- Infinite Stamina Button
+local infiniteStaminaButton = createButton("InfiniteStaminaButton", 0.1, "Infinite Stamina")
+
+-- Hitbox Expander Button
+local hitboxExpanderButton = createButton("HitboxExpanderButton", 0.4, "Hitbox Expander")
+
+-- Control Ball Button
+local controlBallButton = createButton("ControlBallButton", 0.7, "Control Ball")
+
+-- Infinite Stamina Functionality
+local function enableInfiniteStamina()
+    -- Remove Stamina Bar
+    local staminaBar = player.PlayerGui:FindFirstChild("StaminaBar")
+    if staminaBar then
+        staminaBar:Destroy()
+    end
+
+    -- Display Notification
+    local notification = Instance.new("TextLabel")
+    notification.Size = UDim2.new(0.3, 0, 0.05, 0)
+    notification.Position = UDim2.new(0.35, 0, 0.9, 0)
+    notification.BackgroundTransparency = 1
+    notification.Text = "Made by Darkness Hub"
+    notification.TextColor3 = Color3.new(1, 1, 1)
+    notification.Font = Enum.Font.Gotham
+    notification.TextScaled = true
+    notification.Parent = mainGui
+
+    -- Hide notification after 5 seconds
+    task.delay(5, function()
+        notification:Destroy()
+    end)
+
+    -- Grant Infinite Stamina
+    while true do
+        humanoid:SetAttribute("Stamina", math.huge)
+        task.wait(1)
+    end
 end
 
--- Infinite Stamina
-makeButton("Infinite Stamina", 0):MouseButton1Click:Connect(function()
-	notify()
-	local staminaBar = player.PlayerGui:FindFirstChild("StaminaBar")
-	if staminaBar then staminaBar:Destroy() end
-	local hum = character:FindFirstChildOfClass("Humanoid")
-	if hum then
-		hum:GetPropertyChangedSignal("WalkSpeed"):Connect(function()
-			hum.WalkSpeed = 30
-		end)
-		hum.WalkSpeed = 30
-	end
-end)
+-- Hitbox Expander Functionality
+local function enableHitboxExpander()
+    local hitboxSize = 5 -- Default size
+    local redBox = nil
 
--- Hitbox Expander
-makeButton("Hitbox Expander", 0.25):MouseButton1Click:Connect(function()
-	notify()
-	local hrp = character:FindFirstChild("HumanoidRootPart")
-	if hrp and not hrp:FindFirstChild("RedHitbox") then
-		local redBox = Instance.new("BoxHandleAdornment")
-		redBox.Name = "RedHitbox"
-		redBox.Adornee = hrp
-		redBox.AlwaysOnTop = true
-		redBox.ZIndex = 10
-		redBox.Size = Vector3.new(10, 10, 10)
-		redBox.Color3 = Color3.new(1, 0, 0)
-		redBox.Transparency = 0.5
-		redBox.Parent = hrp
-	end
-end)
+    local function createHitbox(size)
+        if redBox then redBox:Destroy() end
+        local hrp = character:FindFirstChild("HumanoidRootPart")
+        if not hrp then return end
 
--- Control Ball
-makeButton("Control Ball", 0.5).MouseButton1Click:Connect(function()
-	notify()
-	local GUI = Instance.new("ScreenGui")
-	GUI.Parent = player:WaitForChild("PlayerGui")
+        redBox = Instance.new("BoxHandleAdornment")
+        redBox.Name = "RedHitbox"
+        redBox.Adornee = hrp
+        redBox.AlwaysOnTop = true
+        redBox.ZIndex = 10
+        redBox.Size = Vector3.new(size, size, size)
+        redBox.Color3 = Color3.new(1, 0, 0)
+        redBox.Transparency = 0.5
+        redBox.Parent = hrp
+    end
 
-	local ControlButton = Instance.new("TextButton")
-	ControlButton.Size = UDim2.new(0.15, 0, 0.08, 0)
-	ControlButton.Position = UDim2.new(0.1, 0, 0.8, 0)
-	ControlButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
-	ControlButton.Text = "CONTROL"
-	ControlButton.Parent = GUI
+    createHitbox(hitboxSize)
+end
 
-	local ControlFrame = Instance.new("Frame")
-	ControlFrame.Size = UDim2.new(0.3, 0, 0.1, 0)
-	ControlFrame.Position = UDim2.new(0.35, 0, 0.6, 0)
-	ControlFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
-	ControlFrame.Visible = false
-	ControlFrame.Parent = GUI
+-- Control Ball Functionality
+local function enableControlBall()
+    local isControlling = false
+    local ball
+    local velocityBody
+    local speedValue = 70
 
-	local SpeedLabel = Instance.new("TextLabel")
-	SpeedLabel.Size = UDim2.new(1, 0, 0.3, 0)
-	SpeedLabel.BackgroundTransparency = 1
-	SpeedLabel.Text = "Speed: 70"
-	SpeedLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-	SpeedLabel.TextScaled = true
-	SpeedLabel.Parent = ControlFrame
+    local function findFootball()
+        return workspace:FindFirstChild("Football")
+    end
 
-	local SpeedInput = Instance.new("TextBox")
-	SpeedInput.Size = UDim2.new(0.8, 0, 0.4, 0)
-	SpeedInput.Position = UDim2.new(0.1, 0, 0.5, 0)
-	SpeedInput.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-	SpeedInput.TextColor3 = Color3.fromRGB(255, 255, 255)
-	SpeedInput.Text = "70"
-	SpeedInput.Parent = ControlFrame
+    local function startControlling()
+        if not ball then return end
 
-	local CreditsLabel = Instance.new("TextLabel")
-	CreditsLabel.Size = UDim2.new(0.3, 0, 0.1, 0)
-	CreditsLabel.Position = UDim2.new(0.35, 0, 0.9, 0)
-	CreditsLabel.BackgroundTransparency = 1
-	CreditsLabel.Text = "Made within Darkness Hub"
-	CreditsLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-	CreditsLabel.TextScaled = true
-	CreditsLabel.Parent = GUI
+        if velocityBody then
+            velocityBody:Destroy()
+            velocityBody = nil
+        end
 
-	task.delay(30, function()
-		CreditsLabel.Visible = false
-	end)
+        camera.CameraSubject = ball
+        local controlVelocity = Instance.new("BodyVelocity")
+        controlVelocity.MaxForce = Vector3.new(999999, 999999, 999999)
+        controlVelocity.Parent = ball
 
-	local IsControlling = false
-	local Ball
-	local VelocityBody
-	local SpeedValue = 70
+        local controlConnection
+        controlConnection = RunService.Heartbeat:Connect(function()
+            if not isControlling or not ball or not ball.Parent then
+                controlVelocity:Destroy()
+                camera.CameraSubject = character
+                if controlConnection then
+                    controlConnection:Disconnect()
+                end
+                return
+            end
+            controlVelocity.Velocity = camera.CFrame.LookVector * speedValue
+        end)
+    end
 
-	local function FindFootball()
-		return workspace:FindFirstChild("Football")
-	end
+    ball = findFootball()
+    if not ball then
+        warn("No Ball Found!")
+        return
+    end
 
-	local function StartControlling()
-		if not Ball then return end
-		if VelocityBody then VelocityBody:Destroy() end
+    isControlling = not isControlling
+    if isControlling then
+        startControlling()
+    end
+end
 
-		Camera.CameraSubject = Ball
-		local ControlVelocity = Instance.new("BodyVelocity")
-		ControlVelocity.MaxForce = Vector3.new(999999, 999999, 999999)
-		ControlVelocity.Parent = Ball
-
-		local connection
-		connection = RunService.Heartbeat:Connect(function()
-			if not IsControlling or not Ball or not Ball.Parent then
-				ControlVelocity:Destroy()
-				Camera.CameraSubject = character
-				connection:Disconnect()
-				return
-			end
-			ControlVelocity.Velocity = Camera.CFrame.LookVector * SpeedValue
-		end)
-	end
-
-	ControlButton.MouseButton1Click:Connect(function()
-		if not Ball then
-			Ball = FindFootball()
-			if not Ball then
-				warn("No Ball Found!")
-				return
-			end
-		end
-		IsControlling = not IsControlling
-		ControlButton.BackgroundColor3 = IsControlling and Color3.fromRGB(0, 255, 0) or Color3.fromRGB(255, 0, 0)
-		ControlFrame.Visible = IsControlling
-		if IsControlling then StartControlling() end
-	end)
-
-	SpeedInput.FocusLost:Connect(function(enterPressed)
-		if enterPressed then
-			local newSpeed = tonumber(SpeedInput.Text)
-			if newSpeed and newSpeed > 0 then
-				SpeedValue = newSpeed
-				SpeedLabel.Text = "Speed: " .. SpeedValue
-			else
-				SpeedInput.Text = tostring(SpeedValue)
-			end
-		end
-	end)
-end)
+-- Connect Buttons to Functions
+infiniteStaminaButton.MouseButton1Click:Connect(enableInfiniteStamina)
+hitboxExpanderButton.MouseButton1Click:Connect(enableHitboxExpander)
+controlBallButton.MouseButton1Click:Connect(enableControlBall)
