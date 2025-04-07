@@ -1,0 +1,116 @@
+-- Darkness Hub | Final Hitbox GUI (Draggable, No Sink, Color Toggle)
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+local char = player.Character or player.CharacterAdded:Wait()
+local StarterGui = game:GetService("StarterGui")
+local CoreGui = game:GetService("CoreGui")
+local RunService = game:GetService("RunService")
+
+-- Remove previous version
+if CoreGui:FindFirstChild("HitboxGUI") then
+	CoreGui:FindFirstChild("HitboxGUI"):Destroy()
+end
+
+-- Create GUI
+local screenGui = Instance.new("ScreenGui", CoreGui)
+screenGui.Name = "HitboxGUI"
+screenGui.ResetOnSpawn = false
+
+local frame = Instance.new("Frame", screenGui)
+frame.Size = UDim2.new(0, 220, 0, 130)
+frame.Position = UDim2.new(0.5, -110, 0.5, -65)
+frame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+frame.BorderSizePixel = 0
+frame.Active = true
+frame.Draggable = true
+
+local textbox = Instance.new("TextBox", frame)
+textbox.PlaceholderText = "Enter size (1-20)"
+textbox.Size = UDim2.new(1, -20, 0, 40)
+textbox.Position = UDim2.new(0, 10, 0, 10)
+textbox.Text = ""
+textbox.TextScaled = true
+textbox.BackgroundColor3 = Color3.new(1, 1, 1)
+
+local button = Instance.new("TextButton", frame)
+button.Text = "Enable Hitbox"
+button.Size = UDim2.new(1, -20, 0, 40)
+button.Position = UDim2.new(0, 10, 0, 60)
+button.TextScaled = true
+button.BackgroundColor3 = Color3.fromRGB(0, 255, 0) -- Green initially
+
+-- Vars
+local hitboxPart = nil
+local connection = nil
+local enabled = false
+
+-- Notification helper
+local function notify(msg)
+	pcall(function()
+		StarterGui:SetCore("SendNotification", {
+			Title = "Darkness Hub",
+			Text = msg,
+			Duration = 4
+		})
+	end)
+end
+
+-- Create external hitbox
+local function createHitbox(size)
+	local root = char:FindFirstChild("HumanoidRootPart")
+	if not root then return end
+
+	hitboxPart = Instance.new("Part")
+	hitboxPart.Anchored = true
+	hitboxPart.CanCollide = false
+	hitboxPart.Transparency = 0.5
+	hitboxPart.Size = Vector3.new(size, size, size)
+	hitboxPart.Material = Enum.Material.ForceField
+	hitboxPart.Color = Color3.new(1, 0, 0)
+	hitboxPart.Name = "FakeHitbox"
+	hitboxPart.Parent = workspace
+
+	local selection = Instance.new("SelectionBox", hitboxPart)
+	selection.Adornee = hitboxPart
+	selection.Color3 = Color3.new(1, 0, 0)
+	selection.Transparency = 0.3
+	selection.LineThickness = 0.05
+
+	-- Position the hitbox above ground
+	connection = RunService.RenderStepped:Connect(function()
+		if char and root and hitboxPart then
+			local offset = Vector3.new(0, (size / 2) - 1, 0)
+			hitboxPart.CFrame = root.CFrame + offset
+		end
+	end)
+end
+
+-- Cleanup
+local function removeHitbox()
+	if connection then connection:Disconnect() end
+	if hitboxPart then hitboxPart:Destroy() end
+	hitboxPart = nil
+end
+
+-- Button logic
+button.MouseButton1Click:Connect(function()
+	if not enabled then
+		local size = tonumber(textbox.Text)
+		if not size then return end
+		size = math.clamp(size, 1, 20)
+
+		createHitbox(size)
+		notify("Hitbox Enabled | Size: " .. size)
+		button.Text = "Disable Hitbox"
+		button.BackgroundColor3 = Color3.fromRGB(255, 50, 50) -- Red
+		enabled = true
+	else
+		removeHitbox()
+		notify("Hitbox Disabled")
+		button.Text = "Enable Hitbox"
+		button.BackgroundColor3 = Color3.fromRGB(0, 255, 0) -- Green
+		enabled = false
+	end
+end)
+
+notify("Darkness Hub Loaded")
