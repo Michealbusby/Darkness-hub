@@ -1,0 +1,73 @@
+-- ReplicatedStorage > VoxelDestruction
+
+local VoxelDestruction = {}
+
+-- CONFIG
+local VOXEL_SIZE = 2
+local DEBRIS_LIFETIME = 4
+local MAX_VOXELS = 250 -- Prevents extreme lag
+
+function VoxelDestruction:BreakPart(part)
+	if not part or not part:IsA("BasePart") then return end
+
+	local size = part.Size
+	local cframe = part.CFrame
+	local color = part.Color
+	local material = part.Material
+
+	local voxelCount = 0
+
+	local function spawnVoxel(pos)
+		if voxelCount >= MAX_VOXELS then return end
+		voxelCount += 1
+
+		local voxel = Instance.new("Part")
+		voxel.Size = Vector3.new(VOXEL_SIZE, VOXEL_SIZE, VOXEL_SIZE)
+		voxel.Anchored = false
+		voxel.CanCollide = true
+		voxel.Position = pos
+		voxel.Color = color
+		voxel.Material = material
+		voxel.TopSurface = Enum.SurfaceType.Smooth
+		voxel.BottomSurface = Enum.SurfaceType.Smooth
+		voxel.CFrame *= CFrame.Angles(
+			math.rad(math.random(0, 360)),
+			math.rad(math.random(0, 360)),
+			math.rad(math.random(0, 360))
+		)
+
+		local velocity = Instance.new("BodyVelocity")
+		velocity.Velocity = Vector3.new(
+			math.random(-40, 40),
+			math.random(10, 80),
+			math.random(-40, 40)
+		)
+		velocity.MaxForce = Vector3.new(1e5, 1e5, 1e5)
+		velocity.P = 1e4
+		velocity.Parent = voxel
+
+		voxel.Parent = workspace
+		game:GetService("Debris"):AddItem(voxel, DEBRIS_LIFETIME)
+	end
+
+	for x = -size.X/2, size.X/2, VOXEL_SIZE do
+		for y = -size.Y/2, size.Y/2, VOXEL_SIZE do
+			for z = -size.Z/2, size.Z/2, VOXEL_SIZE do
+				local offset = Vector3.new(x, y, z)
+				local worldPos = (cframe * CFrame.new(offset)).Position
+				spawnVoxel(worldPos)
+			end
+		end
+	end
+
+	-- Optional: Add explosion FX
+	local explosion = Instance.new("Explosion")
+	explosion.Position = cframe.Position
+	explosion.BlastRadius = 0 -- purely visual
+	explosion.BlastPressure = 0
+	explosion.Parent = workspace
+
+	part:Destroy()
+end
+
+return VoxelDestruction
