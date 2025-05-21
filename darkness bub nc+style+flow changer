@@ -1,0 +1,158 @@
+local players = game:GetService("Players")
+local player = players.LocalPlayer
+local teams = game:GetService("Teams")
+local replicatedStorage = game:GetService("ReplicatedStorage")
+local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/Michealbusby/Darkness-hub/refs/heads/main/libary"))()
+
+MakeWindow({
+    Hub = {
+        Title = "Style changer & no cooldown by darkness(¥)",
+        Animation = "Enjoy!🔥👀"
+    },
+    Key = {
+        KeySystem = false,
+        Title = "Darkness Hub ‼️  (¥)",
+        Description = "^ Blue Lock Rivals ^",
+        KeyLink = "https://discord.gg/A3y3cN5D3K",
+        Keys = {"darknesshub", "71838", "28282", "1", "28282"},
+        Notifi = {
+            Notifications = true,
+            CorrectKey = "Correct✅",
+            Incorrectkey = "False😡‼️",
+            CopyKeyLink = "Copied Discord Link"
+        }
+    }
+})
+
+MinimizeButton({
+    Image = "rbxassetid://7229442422",
+    Size = {40, 40},
+    Color = Color3.fromRGB(10, 10, 10),
+    Corner = true,
+    Stroke = true,
+    StrokeColor = Color3.fromHSV(0.5, 1, 1)
+})
+
+MakeNotifi({
+    Title = "Executed!",
+    Text = "Boom!✅",
+    Time = 5
+})
+
+local Main = MakeTab({Name = "No cooldown"})
+
+AddButton(Main, {
+    Name = "¥ No Ability Cooldown",
+    Callback = function()
+        local AbilityController = require(game:GetService("ReplicatedStorage").Controllers.AbilityController)
+        local OriginalAbilityCooldown
+
+        OriginalAbilityCooldown = hookfunction(AbilityController.AbilityCooldown, function(Self)
+            return
+        end)
+
+        game:GetService("StarterGui"):SetCore("SendNotification", {
+            Title = "Join darkness Hub For Updates!",
+            Text = "No Cooldown Script Completed✅",
+            Button1 = "W darkness!",
+            Button2 = "W darkness!",
+            Duration = 90
+        })
+    end
+})
+
+local Main = MakeTab({Name = "STYLE AND FLOW"})
+
+local sectionStyle = AddSection(Main, {"Styles ( Most of them work with skills)"})
+
+local function set_style(desired_style)
+    if player:FindFirstChild("PlayerStats") then
+        local playerStats = player.PlayerStats
+        if playerStats:FindFirstChild("Style") then
+            playerStats.Style.Value = desired_style
+        end
+    end
+end
+
+local function set_flow(desired_flow)
+    if player:FindFirstChild("PlayerStats") then
+        local playerStats = player.PlayerStats
+        if playerStats:FindFirstChild("Flow") then
+            playerStats.Flow.Value = desired_flow
+        end
+    end
+end
+
+local styleId
+
+local StyleTextBox = AddTextBox(Main, {
+    Name = "Style Name",
+    Default = "",
+    TextDisappear = false,
+    PlaceholderText = "PUT NAME",
+    ClearText = true,
+    Callback = function(value)
+        styleId = value
+    end
+})
+
+AddButton(Main, {
+    Name = "GET THE STYLE",
+    Description = "DONT SPAM!",
+    Callback = function()
+        if styleId and styleId ~= "" then
+            set_style(styleId)
+            MakeNotifi({
+                Title = "SUCCESS",
+                Text = " by W darkness ",
+                Time = 5
+            })
+        else
+            MakeNotifi({
+                Title = "WRONG PLS BE CAREFUL",
+                Text = "By W darkness",
+                Time = 5
+            })
+        end
+    end
+})
+
+local sectionFlow = AddSection(Main, {"Flows"})
+
+local flow_name
+
+local FlowTextBox = AddTextBox(Main, {
+    Name = "Flow Name",
+    Default = "",
+    TextDisappear = false,
+    PlaceholderText = "PUT NAME",
+    ClearText = true,
+    Callback = function(value)
+        flow_name = value
+    end
+})
+
+AddButton(Main, {
+    Name = "GET THE FLOW",
+    Description = "DONT SPAM!",
+    Callback = function()
+        if flow_name and flow_name ~= "" then
+            set_flow(flow_name)
+            MakeNotifi({
+                Title = "SUCCESS",
+                Text = "By W darkness",
+                Time = 5
+            })
+        else
+            MakeNotifi({
+                Title = "WRONG PLS BE CAREFUL",
+                Text = "By W darkness",
+                Time = 5
+            })
+        end
+    end
+})
+
+local sectionFlow2 = AddSection(Main, {"Flows Function"})
+
+local localPlayer = game:GetService("Players").LocalPlayer
