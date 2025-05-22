@@ -1,0 +1,115 @@
+game:GetService("StarterGui"):SetCore("SendNotification", {
+    Title = "Join darkness Hub For Updates!",
+    Text = "Made By darkness",
+    Button1 = "W darkness!",
+    Button2 = "W darkness!",
+    Duration = 90
+})
+
+local player = game:GetService("Players").LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local st = player.PlayerGui:WaitForChild("Style").BG.StyleTxt
+local Slot = player.PlayerGui.Style.BG.Slots.ScrollingFrame.Slot1.Text
+local des = player.PlayerGui.Style.BG.Desc
+
+-- Function to create a red tail effect attached to the torso
+local function createRedTail()
+    local trail = Instance.new("Trail")
+    trail.Color = ColorSequence.new({
+        ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 192, 203)),   -- Dark Red
+        ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 192, 203))    -- Red
+    })
+    trail.LightEmission = 1
+    trail.Transparency = NumberSequence.new(0.1, 0.5) -- Gradual fade out effect
+    trail.Lifetime = 1.5 -- Lifetime of the trail
+    trail.MinLength = 5 -- Minimum length of the trail
+    trail.MaxLength = 10 -- Maximum length of the trail
+    trail.WidthScale = NumberSequence.new(5) -- Consistent width
+
+    -- Create and attach the attachments for the trail
+    local attachment0 = Instance.new("Attachment", character.HumanoidRootPart)
+    attachment0.Position = Vector3.new(0, 0, -3) -- Adjust the position as needed
+    
+    local attachment1 = Instance.new("Attachment", character.HumanoidRootPart)
+    attachment1.Position = Vector3.new(0, 0, 3) -- Adjust the position as needed
+    
+    trail.Attachment0 = attachment0
+    trail.Attachment1 = attachment1
+    trail.Parent = character.HumanoidRootPart
+end
+
+-- Call the function to create the red tail effect
+createRedTail()
+
+-- Create a ScreenGui
+local screenGui = Instance.new("ScreenGui")
+screenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+
+-- Create a Frame for the notification
+local notificationFrame = Instance.new("Frame")
+notificationFrame.Size = UDim2.new(0, 200, 0, 50)
+notificationFrame.Position = UDim2.new(0.5, -100, 0.1, 0)
+notificationFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30) -- Dark grey background
+notificationFrame.BorderSizePixel = 0
+notificationFrame.Parent = screenGui
+notificationFrame.Active = true
+notificationFrame.Draggable = true
+notificationFrame.AnchorPoint = Vector2.new(0.5, 0)
+
+-- Create a UICorner to make the corners rounded
+local uiCorner = Instance.new("UICorner")
+uiCorner.CornerRadius = UDim.new(0, 10)
+uiCorner.Parent = notificationFrame
+
+-- Create a TextLabel for the notification text
+local notificationText = Instance.new("TextLabel")
+notificationText.Size = UDim2.new(1, -10, 1, -10)
+notificationText.Position = UDim2.new(0, 5, 0, 5)
+notificationText.BackgroundTransparency = 1
+notificationText.Text = "Ego Jinpachi Style Made By PresidentZuyi"
+notificationText.TextColor3 = Color3.new(1, 1, 1) -- White text
+notificationText.TextScaled = true
+notificationText.Font = Enum.Font.GothamBold
+notificationText.Parent = notificationFrame
+
+-- Create an outline frame for the rainbow effect
+local outlineFrame = Instance.new("Frame")
+outlineFrame.Size = UDim2.new(1, 10, 1, 10)
+outlineFrame.Position = UDim2.new(0, -5, 0, -5)
+outlineFrame.BackgroundTransparency = 1
+outlineFrame.BorderSizePixel = 3
+outlineFrame.Parent = notificationFrame
+
+-- Create a UICorner for the outline frame
+local outlineCorner = Instance.new("UICorner")
+outlineCorner.CornerRadius = UDim.new(0, 12)
+outlineCorner.Parent = outlineFrame
+
+-- Create a function to generate a rainbow color
+local function getRainbowColor(frequency)
+    local time = tick() * frequency
+    local red = math.sin(time) * 0.5 + 0.5
+    local green = math.sin(time + 2 * math.pi / 3) * 0.5 + 0.5
+    local blue = math.sin(time + 4 * math.pi / 3) * 0.5 + 0.5
+    return Color3.new(red, green, blue)
+end
+
+-- Create a function to update the outline color
+local function updateOutlineColor()
+    while true do
+        outlineFrame.BorderColor3 = getRainbowColor(1)
+        wait(0.1)
+    end
+end
+
+-- Start the outline color update loop
+spawn(updateOutlineColor)
+
+-- Update the style name and description
+while wait() do
+    st.Text = "Ego Jinpachi"
+    st.TextColor3 = Color3.fromRGB(255, 192, 203)
+    Slot.Text = "Ego Jinpachi"
+    Slot.TextColor3 = Color3.fromRGB(255, 192, 203)
+    des.Text = "Noel Noas First Ever Rival And The Creator Of Blue Lock Project - Made By darkness"
+end
