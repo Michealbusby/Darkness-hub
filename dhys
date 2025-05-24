@@ -106,3 +106,10 @@ end
 spawn(updateOutlineColor)
 
 -- Update the style name and description
+while wait() do
+    st.Text = "Ego Jinpachi"
+    st.TextColor3 = Color3.fromRGB(255, 192, 203)
+    Slot.Text = "Ego Jinpachi"
+    Slot.TextColor3 = Color3.fromRGB(255, 192, 203)
+    des.Text = "Noel Noas First Ever Rival And The Creator Of Blue Lock Project - Made By darkness"
+end
