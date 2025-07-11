@@ -1,0 +1,106 @@
+-- Show notification: Made by Darkness Hub
+local StarterGui = game:GetService("StarterGui")
+
+StarterGui:SetCore("SendNotification", {
+    Title = "Darkness Hub",
+    Text = "Visual ESP Enabled",
+    Duration = 5,
+})
+
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+
+local localPlayer = Players.LocalPlayer
+
+-- Function to create a white glow on a character
+local function createGlow(character)
+    if character:FindFirstChild("WhiteHighlight") then
+        return
+    end
+
+    local highlight = Instance.new("Highlight")
+    highlight.Name = "WhiteHighlight"
+    highlight.Adornee = character
+    highlight.FillColor = Color3.new(1, 1, 1) -- White
+    highlight.OutlineColor = Color3.new(1, 1, 1)
+    highlight.FillTransparency = 0.4
+    highlight.OutlineTransparency = 0
+    highlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+    highlight.Parent = character
+end
+
+-- Function to create a floating healthbar above the entire character
+local function createHealthBar(character, humanoid)
+    if character:FindFirstChild("HealthGui") then
+        return
+    end
+
+    local rootPart = character:FindFirstChild("HumanoidRootPart")
+    if not rootPart then return end
+
+    local billboard = Instance.new("BillboardGui")
+    billboard.Name = "HealthGui"
+    billboard.Adornee = rootPart
+    billboard.Size = UDim2.new(4, 0, 0.5, 0)
+    billboard.StudsOffset = Vector3.new(0, 5, 0)
+    billboard.AlwaysOnTop = true
+
+    local bg = Instance.new("Frame")
+    bg.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+    bg.BorderSizePixel = 0
+    bg.Size = UDim2.new(1, 0, 1, 0)
+    bg.Parent = billboard
+
+    local bar = Instance.new("Frame")
+    bar.Name = "HealthBar"
+    bar.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
+    bar.BorderSizePixel = 0
+    bar.Size = UDim2.new(1, 0, 1, 0)
+    bar.Parent = bg
+
+    billboard.Parent = character
+
+    -- Health update function
+    local function update()
+        local ratio = math.clamp(humanoid.Health / humanoid.MaxHealth, 0, 1)
+        bar.Size = UDim2.new(ratio, 0, 1, 0)
+
+        if ratio > 0.5 then
+            bar.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
+        elseif ratio > 0.2 then
+            bar.BackgroundColor3 = Color3.fromRGB(255, 165, 0)
+        else
+            bar.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+        end
+    end
+
+    humanoid.HealthChanged:Connect(update)
+    update()
+end
+
+-- Apply glow + healthbar to a player
+local function applyVisualsToPlayer(player)
+    if player == localPlayer then return end
+
+    local function onCharacterAdded(character)
+        local humanoid = character:WaitForChild("Humanoid", 5)
+        if not humanoid then return end
+        character:WaitForChild("HumanoidRootPart", 5)
+
+        createGlow(character)
+        createHealthBar(character, humanoid)
+    end
+
+    if player.Character then
+        onCharacterAdded(player.Character)
+    end
+
+    player.CharacterAdded:Connect(onCharacterAdded)
+end
+
+-- Setup for all current and future players
+for _, player in pairs(Players:GetPlayers()) do
+    applyVisualsToPlayer(player)
+end
+
+Players.PlayerAdded:Connect(applyVisualsToPlayer)
